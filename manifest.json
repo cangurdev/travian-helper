@@ -9,7 +9,7 @@
     "permissions": ["activeTab", "scripting"],
     "content_scripts": [
       {
-        "matches": ["https://*/*", "http://*/*"],
+        "matches": ["https://*.travian.com/*"],
         "js": ["content.js"]
       }
     ]
