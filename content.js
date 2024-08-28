@@ -1,6 +1,6 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "load") {
-        const wrapper = document.querySelector('#sidebarAfterContent > .sidebarBoxWrapper');
+        const wrapper = document.querySelector('#sidebarBeforeContent > .sidebarBoxWrapper');
         const div = document.createElement("div");
         div.id = "travina_ultra_plus";
         div.style.width = "400px";
@@ -23,10 +23,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         document.getElementById('findElephant').addEventListener('click', () => {
             findElephant();
         });
-    }
-
-    if (request.action === "updateTable") {
-        document.querySelector('#travina_ultra_plus > .content >#table').innerHTML = request.payload;
     }
 });
 
@@ -66,6 +62,7 @@ async function findVillage() {
   
           tileList.push({
             name      : attrs.name,
+            tribe     : attrs.tribe,
             population: attrs.population,
             clan      : attrs.clan,
             distance  : distance,
@@ -88,7 +85,9 @@ async function findVillage() {
             href="https://ts8.x1.europe.travian.com/karte.php?x=${tile.x}&y=${tile.y}"
             title = (${tile.x}|${tile.y})
           >
-            ${tile.name} 
+            ${tile.name}
+            <br>
+            ${tile.tribe}
           </a></td>
           <td>${tile.population}</td>
           <td>${tile.clan || ""}</td>
@@ -132,10 +131,12 @@ function findElephant() {
    
       tiles?.forEach( tile => {
         const attrs = extractAttrs(escapeHtml(tile.text), tile.did);
+
         if (attrs?.population.includes("Fil")) {
           const distance = getDistance(myX, myY, tile.position.x, tile.position.y);
             
           const row = document.createElement("tr");
+
           row.innerHTML = `
             <td><a target="_blank" href="https://ts8.x1.europe.travian.com/karte.php?x=${tile.position.x}&y=${tile.position.y}"> ${tile.position.x}|${tile.position.y} </a></td>
             <td>${attrs.population}</td>
@@ -211,7 +212,8 @@ function findElephant() {
     const nameMatch       = str.match(/{k\.spieler}\s*(\w+)/);
     const populationMatch = str.match(/{k\.einwohner}\s*(\d+)/);
     const clanMatch       = str.match(/{k\.allianz}\s*(\w+)/);
-  
+    const tribeMatch      = str.match(/k\.volk}\s*{(\w+).(\w+)}/);
+
     const animals = {
       u31: "Sıçan",
       u32: "Örümcek",
@@ -225,6 +227,14 @@ function findElephant() {
       u40: "Fil",
     };
   
+    const tribes = {
+      "v1": "Romalı",
+      "v2": "Cermen",
+      "v3": "Galyalı",
+      "v4": "Doğa",
+      "v5": "Natar",
+    }
+
     if (did === -1) {
       const regex = /<i class="unit (u\d+)"><\/i><span class="value ">(\d+)<\/span>/g;
       let match;
@@ -249,14 +259,16 @@ function findElephant() {
     }
   
     if (nameMatch && populationMatch) {
-      let name        = nameMatch[1];  
-      let population  = populationMatch[1];
-      let clan        = clanMatch?.[1] || "";
+      const name       = nameMatch[1];
+      const population = populationMatch[1];
+      const clan       = clanMatch?.[1] || "";
+      const tribeKey   = tribeMatch?.[2] || "";
   
       return {
         name,
         population,
-        clan
+        clan,
+        tribe: tribes[tribeKey] || ""
       }
     } else {
       return null;
