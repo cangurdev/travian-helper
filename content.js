@@ -3,11 +3,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const wrapper = document.querySelector('#sidebarBeforeContent > .sidebarBoxWrapper');
         const div = document.createElement("div");
         div.id = "travina_ultra_plus";
-        div.style.width = "400px";
+        div.style.width = "600px";
         div.innerHTML = `
                 <div class='content'>
                     <h3>Kardeşim Hoş Geldin</h3>
-                    <button id="findVillage">Köyleri Bul</button>
                     <button id="findElephant">Fil Bul</button>
                     <div id='table' style="max-height: 300px; overflow:auto"></div>
                 </div>
@@ -15,10 +14,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         div.className = "sidebarBox";
 
         wrapper.appendChild(div);
-
-         document.getElementById('findVillage').addEventListener('click', () => {
-            findVillage();
-        });
+        
+        findVillage();
 
         document.getElementById('findElephant').addEventListener('click', () => {
             findElephant();
@@ -46,6 +43,7 @@ async function findVillage() {
       thead.innerHTML = `
         <tr>
           <th>Köy</th>
+          <th>Halk</th>
           <th>Nüfus</th>
           <th>ittifak</th>
           <th>Mesafe</th>
@@ -86,9 +84,8 @@ async function findVillage() {
             title = (${tile.x}|${tile.y})
           >
             ${tile.name}
-            <br>
-            ${tile.tribe}
-          </a></td>
+            </a></td>
+          <td>${tile.tribe || ""}</td>
           <td>${tile.population}</td>
           <td>${tile.clan || ""}</td>
           <td>${tile.distance}</td>
