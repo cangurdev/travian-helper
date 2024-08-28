@@ -88,7 +88,7 @@ async function findVillage() {
           <td>${tile.tribe || ""}</td>
           <td>${tile.population}</td>
           <td>${tile.clan || ""}</td>
-          <td>${tile.distance}</td>
+          <td>${tile.distance.toFixed(1)}<br>${getTime(tile.distance)}</td>
         `;
         
         tbody.appendChild(row);
@@ -276,7 +276,7 @@ function findElephant() {
     const dx = x2 - x1;
     const dy = y2 - y1;
   
-    return Math.sqrt(dx * dx + dy * dy).toFixed(1);
+    return Math.sqrt(dx * dx + dy * dy);
   }
   
   function escapeHtml(html) {
@@ -289,3 +289,16 @@ function findElephant() {
   
     return dom.documentElement.textContent;
   }
+
+  function getTime(distance) {
+    const time    = distance / 19;
+    const hours   = Math.floor(time);
+    const minutes = Math.floor(((time - hours) * 60));
+    const seconds = Math.round(( ((time - hours) * 60) - minutes) * 60);
+    
+    const formattedHours   = String(hours).padStart(2, '0');
+    const formattedMinutes = String(minutes).padStart(2, '0');
+    const formattedSeconds = String(seconds) .padStart(2, '0');
+
+    return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+}
