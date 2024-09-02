@@ -1,7 +1,7 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "load") {
     const wrapper = document.querySelector('#sidebarBeforeContent > .sidebarBoxWrapper');
-    const div     = document.createElement("div");
+    const div = document.createElement("div");
 
     div.id = "travina_ultra_plus";
     div.className = "sidebar";
@@ -9,6 +9,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     div.innerHTML = `
                 <div class='content sidebarBoxWrapper' style= "margin-top: 220px">
+                  <div id="heroArea" class="boxTitle"></div>
                   <div 
                     id    = "content"
                     class = 'sidebarBox'
@@ -32,6 +33,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     wrapper.appendChild(div);
 
+    getHeroInfo();
     findVillage();
 
     document.getElementById('find').addEventListener('click', () => {
@@ -77,13 +79,13 @@ async function findVillage() {
         const distance = getDistance(myX, myY, tile.position.x, tile.position.y);
 
         const model = {
-          name      : attrs.name,
-          tribe     : attrs.tribe,
+          name: attrs.name,
+          tribe: attrs.tribe,
           population: attrs.population,
-          clan      : attrs.clan,
-          distance  : distance,
-          x         : tile.position.x,
-          y         : tile.position.y
+          clan: attrs.clan,
+          distance: distance,
+          x: tile.position.x,
+          y: tile.position.y
         }
 
         if (attrs.population?.includes("Fil")) {
@@ -272,7 +274,7 @@ function getTime(distance) {
   return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
 }
 
-async function getRaidBounties(){
+async function getRaidBounties() {
   const farmListId = await getProfile();
 
   fetch("https://ts8.x1.europe.travian.com/api/v1/graphql", {
@@ -297,12 +299,12 @@ async function getRaidBounties(){
     "method": "POST",
     "mode": "cors",
     "credentials": "include"
-  }).then( res => res.json())
-    .then( response => {
+  }).then(res => res.json())
+    .then(response => {
       const sources = [0, 0, 0, 0];
 
-      response.data.farmList.slots.forEach( slot => {
-        sources.forEach( (source, i) => 
+      response.data.farmList.slots.forEach(slot => {
+        sources.forEach((source, i) =>
           sources[i] = source + slot.lastRaid.booty[i].amount
         )
       });
@@ -329,15 +331,15 @@ async function getRaidBounties(){
 
 function createTable(theadInnerHtml, rowInnerHtml) {
   const resultDiv = document.createElement("div");
-  const table     = document.createElement("table");
-  const thead     = document.createElement("thead");
-  const tbody     = document.createElement("tbody");
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const tbody = document.createElement("tbody");
 
   thead.innerHTML = theadInnerHtml;
 
-  rowInnerHtml.forEach( (row) => {
+  rowInnerHtml.forEach((row) => {
     const trow = document.createElement("tr");
-    
+
     trow.innerHTML = row;
     tbody.appendChild(trow);
   });
@@ -378,4 +380,39 @@ async function getProfile() {
   const data = await response.json();
 
   return data.data.ownPlayer.farmLists[0].id;
+}
+
+async function getHeroInfo() {
+  const response = await fetch("https://ts8.x1.europe.travian.com/api/v1/hero/dataForHUD", {
+    "headers": {
+      "accept": "application/json, text/javascript, */*; q=0.01",
+      "accept-language": "en-US,en;q=0.9,tr;q=0.8",
+      "content-type": "application/json; charset=UTF-8",
+      "priority": "u=1, i",
+      "sec-ch-ua": "\"Chromium\";v=\"128\", \"Not;A=Brand\";v=\"24\", \"Brave\";v=\"128\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": "\"macOS\"",
+      "sec-fetch-dest": "empty",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-site": "same-origin",
+      "sec-gpc": "1",
+      "x-requested-with": "XMLHttpRequest",
+      "x-version": "2546.3"
+    },
+    "referrer": "https://ts8.x1.europe.travian.com/karte.php?zoom=1&x=-61&y=24",
+    "referrerPolicy": "strict-origin-when-cross-origin",
+    "body": null,
+    "method": "GET",
+    "mode": "cors",
+    "credentials": "include"
+  });
+
+  const data       = await response.json();
+  const health     = data.health;
+  const experience = data.tooltipForExperience.split("Kahramanın")[1].split("tecrübeye")[0].trim();
+  const div        = document.createElement("div");
+
+  div.innerHTML = `Deneyim: ${experience} | Sağlık: ${health}`;
+  
+  document.querySelector("#heroArea").appendChild(div);
 }
