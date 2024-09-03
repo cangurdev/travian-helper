@@ -1,14 +1,14 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "load") {
-    const wrapper = document.querySelector('#sidebarBeforeContent > .sidebarBoxWrapper');
-    const div = document.createElement("div");
+    const wrapper   = document.querySelector('#sidebarBeforeContent > .sidebarBoxWrapper');
+    const container = document.querySelector('#travian_ultra_plus');
+    const div       = document.createElement("div");
 
-    div.id = "travina_ultra_plus";
-    div.className = "sidebar";
+    div.id          = "travian_ultra_plus";
     div.style.width = "600px";
 
     div.innerHTML = `
-                <div class='content sidebarBoxWrapper' style= "margin-top: 220px">
+                <div class='content sidebarBoxWrapper'>
                   <div id="heroArea" class="boxTitle"></div>
                   <div 
                     id    = "content"
@@ -30,11 +30,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 </div>
             `;
     div.className = "sidebarBox";
-
-    wrapper.appendChild(div);
+    
+    if (container) {
+      container.innerHTML = div.innerHTML;
+    } else {
+      wrapper.appendChild(div);
+    }
 
     getHeroInfo();
-    findVillage();
+    findVillage();    
 
     document.getElementById('find').addEventListener('click', () => {
       findVillage();
@@ -47,12 +51,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 function updateTable(payload) {
-  document.querySelector('#travina_ultra_plus > .content > #content > #table').innerHTML = payload;
+  document.querySelector('#travian_ultra_plus > .content > #content > #table').innerHTML = payload;
 }
 
 async function findVillage() {
-  const resultDiv = document.createElement("div");
-
   const myX = -64;
   const myY = 29;
 
@@ -410,9 +412,6 @@ async function getHeroInfo() {
   const data       = await response.json();
   const health     = data.health;
   const experience = data.tooltipForExperience.split("Kahramanın")[1].split("tecrübeye")[0].trim();
-  const div        = document.createElement("div");
-
-  div.innerHTML = `Deneyim: ${experience} | Sağlık: ${health}`;
   
-  document.querySelector("#heroArea").appendChild(div);
+  document.querySelector("#heroArea").innerHTML = `Deneyim: ${experience} | Sağlık: ${health}`;
 }
