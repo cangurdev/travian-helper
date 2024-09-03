@@ -307,7 +307,7 @@ async function getRaidBounties() {
 
       response.data.farmList.slots.forEach(slot => {
         sources.forEach((source, i) =>
-          sources[i] = source + slot.lastRaid.booty[i].amount
+          sources[i] = source + slot.lastRaid?.booty[i].amount || 0
         )
       });
 
