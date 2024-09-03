@@ -154,22 +154,12 @@ async function sendReq() {
       "accept": "application/json, text/javascript, */*; q=0.01",
       "accept-language": "en-US,en;q=0.9,tr;q=0.8",
       "content-type": "application/json; charset=UTF-8",
-      "priority": "u=1, i",
-      "sec-ch-ua": "\"Not)A;Brand\";v=\"99\", \"Brave\";v=\"127\", \"Chromium\";v=\"127\"",
-      "sec-ch-ua-mobile": "?0",
-      "sec-ch-ua-platform": "\"macOS\"",
-      "sec-fetch-dest": "empty",
-      "sec-fetch-mode": "cors",
-      "sec-fetch-site": "same-origin",
-      "sec-gpc": "1",
       "x-requested-with": "XMLHttpRequest",
-      "x-version": "2531.7"
+      "x-version": "2531.7",
     },
     "referrer": `https://ts8.x1.europe.travian.com/karte.php?zoom=${zoom}&x=${x}&y=${y}`,
-    "referrerPolicy": "strict-origin-when-cross-origin",
     "body": JSON.stringify(obj),
     "method": "POST",
-    "mode": "cors",
     "credentials": "include"
   });
 
@@ -286,22 +276,12 @@ async function getRaidBounties() {
           "accept": "application/json, text/javascript, */*; q=0.01",
           "accept-language": "en-US,en;q=0.9,tr;q=0.8",
           "content-type": "application/json; charset=UTF-8",
-          "priority": "u=1, i",
-          "sec-ch-ua": "\"Chromium\";v=\"128\", \"Not;A=Brand\";v=\"24\", \"Brave\";v=\"128\"",
-          "sec-ch-ua-mobile": "?0",
-          "sec-ch-ua-platform": "\"macOS\"",
-          "sec-fetch-dest": "empty",
-          "sec-fetch-mode": "cors",
-          "sec-fetch-site": "same-origin",
-          "sec-gpc": "1",
           "x-requested-with": "XMLHttpRequest",
           "x-version": "2546.3"
         },
         "referrer": "https://ts8.x1.europe.travian.com/build.php?id=39&gid=16&tt=99",
-        "referrerPolicy": "strict-origin-when-cross-origin",
         "body": `{\"query\":\"query($id: Int!, $onlyExpanded: Boolean){bootstrapData{timestamp}weekendWarrior{isNightTruce}farmList(id: $id){id name slotsAmount runningRaidsAmount isExpanded sortIndex lastStartedTime sortField sortDirection useShip ownerVillage{id troops{ownTroopsAtTown{units{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}}}}defaultTroop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}slotStates: slots{id isActive}slots(onlyExpanded: $onlyExpanded){id target{id mapId x y name type population}troop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}distance isActive isRunning runningAttacks nextAttackAt lastRaid{reportId authKey time booty{resourceType{id code}amount}bootyMax icon}totalBooty{booty raids}}}}\",\"variables\":{\"id\":${id},\"onlyExpanded\":false}}`,
         "method": "POST",
-        "mode": "cors",
         "credentials": "include"
       })
       .then(res => res.json())
@@ -375,22 +355,12 @@ async function getProfile() {
       "accept": "application/json, text/javascript, */*; q=0.01",
       "accept-language": "en-US,en;q=0.9,tr;q=0.8",
       "content-type": "application/json; charset=UTF-8",
-      "priority": "u=1, i",
-      "sec-ch-ua": "\"Chromium\";v=\"128\", \"Not;A=Brand\";v=\"24\", \"Brave\";v=\"128\"",
-      "sec-ch-ua-mobile": "?0",
-      "sec-ch-ua-platform": "\"macOS\"",
-      "sec-fetch-dest": "empty",
-      "sec-fetch-mode": "cors",
-      "sec-fetch-site": "same-origin",
-      "sec-gpc": "1",
       "x-requested-with": "XMLHttpRequest",
       "x-version": "2546.3"
     },
     "referrer": "https://ts8.x1.europe.travian.com/build.php?id=39&gid=16",
-    "referrerPolicy": "strict-origin-when-cross-origin",
     "body": "{\"query\":\"query($onlyExpanded: Boolean){bootstrapData{timestamp}weekendWarrior{isNightTruce}ownPlayer{isSitter isInVacationMode beginnersProtection accessRights{sendRaids}banInfo{type}village{id tribeId}villages{id name hasRallyPoint hasHarbour tribeId}abandonedFarmLists{id name slotsAmount runningRaidsAmount isExpanded sortIndex lastStartedTime sortField sortDirection useShip ownerVillage{id}defaultTroop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}slotStates: slots{id isActive}slots(onlyExpanded: $onlyExpanded){id target{id mapId x y name type population}troop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}distance isActive isRunning runningAttacks nextAttackAt lastRaid{reportId authKey time booty{resourceType{id code}amount}bootyMax icon}totalBooty{booty raids}}}farmLists{id name slotsAmount runningRaidsAmount isExpanded sortIndex lastStartedTime sortField sortDirection useShip ownerVillage{id troops{ownTroopsAtTown{units{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}}}}defaultTroop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}slotStates: slots{id isActive}slots(onlyExpanded: $onlyExpanded){id target{id mapId x y name type population}troop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}distance isActive isRunning runningAttacks nextAttackAt lastRaid{reportId authKey time booty{resourceType{id code}amount}bootyMax icon}totalBooty{booty raids}}}deactivatedFarmListTargets{id mapId x y name type}}}\",\"variables\":{\"onlyExpanded\":true}}",
     "method": "POST",
-    "mode": "cors",
     "credentials": "include"
   })
 
@@ -402,25 +372,13 @@ async function getProfile() {
 async function getHeroInfo() {
   const response = await fetch("https://ts8.x1.europe.travian.com/api/v1/hero/dataForHUD", {
     "headers": {
-      "accept": "application/json, text/javascript, */*; q=0.01",
-      "accept-language": "en-US,en;q=0.9,tr;q=0.8",
-      "content-type": "application/json; charset=UTF-8",
-      "priority": "u=1, i",
-      "sec-ch-ua": "\"Chromium\";v=\"128\", \"Not;A=Brand\";v=\"24\", \"Brave\";v=\"128\"",
-      "sec-ch-ua-mobile": "?0",
-      "sec-ch-ua-platform": "\"macOS\"",
-      "sec-fetch-dest": "empty",
-      "sec-fetch-mode": "cors",
-      "sec-fetch-site": "same-origin",
-      "sec-gpc": "1",
+      "accept": "application/json",
+      "content-type": "application/json",
       "x-requested-with": "XMLHttpRequest",
       "x-version": "2546.3"
     },
     "referrer": "https://ts8.x1.europe.travian.com/karte.php?zoom=1&x=-61&y=24",
-    "referrerPolicy": "strict-origin-when-cross-origin",
-    "body": null,
     "method": "GET",
-    "mode": "cors",
     "credentials": "include"
   });
 
