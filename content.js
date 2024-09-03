@@ -277,42 +277,65 @@ function getTime(distance) {
 }
 
 async function getRaidBounties() {
-  const farmListId = await getProfile();
+  const farmListIds = await getProfile();
+  
+  const results = await Promise.all(
+    farmListIds.map( id => 
+      fetch("https://ts8.x1.europe.travian.com/api/v1/graphql", {
+        "headers": {
+          "accept": "application/json, text/javascript, */*; q=0.01",
+          "accept-language": "en-US,en;q=0.9,tr;q=0.8",
+          "content-type": "application/json; charset=UTF-8",
+          "priority": "u=1, i",
+          "sec-ch-ua": "\"Chromium\";v=\"128\", \"Not;A=Brand\";v=\"24\", \"Brave\";v=\"128\"",
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": "\"macOS\"",
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-origin",
+          "sec-gpc": "1",
+          "x-requested-with": "XMLHttpRequest",
+          "x-version": "2546.3"
+        },
+        "referrer": "https://ts8.x1.europe.travian.com/build.php?id=39&gid=16&tt=99",
+        "referrerPolicy": "strict-origin-when-cross-origin",
+        "body": `{\"query\":\"query($id: Int!, $onlyExpanded: Boolean){bootstrapData{timestamp}weekendWarrior{isNightTruce}farmList(id: $id){id name slotsAmount runningRaidsAmount isExpanded sortIndex lastStartedTime sortField sortDirection useShip ownerVillage{id troops{ownTroopsAtTown{units{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}}}}defaultTroop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}slotStates: slots{id isActive}slots(onlyExpanded: $onlyExpanded){id target{id mapId x y name type population}troop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}distance isActive isRunning runningAttacks nextAttackAt lastRaid{reportId authKey time booty{resourceType{id code}amount}bootyMax icon}totalBooty{booty raids}}}}\",\"variables\":{\"id\":${id},\"onlyExpanded\":false}}`,
+        "method": "POST",
+        "mode": "cors",
+        "credentials": "include"
+      })
+      .then(res => res.json())
+      .then(response => {
+        const sources = [0, 0, 0, 0];
 
-  fetch("https://ts8.x1.europe.travian.com/api/v1/graphql", {
-    "headers": {
-      "accept": "application/json, text/javascript, */*; q=0.01",
-      "accept-language": "en-US,en;q=0.9,tr;q=0.8",
-      "content-type": "application/json; charset=UTF-8",
-      "priority": "u=1, i",
-      "sec-ch-ua": "\"Chromium\";v=\"128\", \"Not;A=Brand\";v=\"24\", \"Brave\";v=\"128\"",
-      "sec-ch-ua-mobile": "?0",
-      "sec-ch-ua-platform": "\"macOS\"",
-      "sec-fetch-dest": "empty",
-      "sec-fetch-mode": "cors",
-      "sec-fetch-site": "same-origin",
-      "sec-gpc": "1",
-      "x-requested-with": "XMLHttpRequest",
-      "x-version": "2546.3"
-    },
-    "referrer": "https://ts8.x1.europe.travian.com/build.php?id=39&gid=16&tt=99",
-    "referrerPolicy": "strict-origin-when-cross-origin",
-    "body": `{\"query\":\"query($id: Int!, $onlyExpanded: Boolean){bootstrapData{timestamp}weekendWarrior{isNightTruce}farmList(id: $id){id name slotsAmount runningRaidsAmount isExpanded sortIndex lastStartedTime sortField sortDirection useShip ownerVillage{id troops{ownTroopsAtTown{units{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}}}}defaultTroop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}slotStates: slots{id isActive}slots(onlyExpanded: $onlyExpanded){id target{id mapId x y name type population}troop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}distance isActive isRunning runningAttacks nextAttackAt lastRaid{reportId authKey time booty{resourceType{id code}amount}bootyMax icon}totalBooty{booty raids}}}}\",\"variables\":{\"id\":${farmListId},\"onlyExpanded\":false}}`,
-    "method": "POST",
-    "mode": "cors",
-    "credentials": "include"
-  }).then(res => res.json())
-    .then(response => {
-      const sources = [0, 0, 0, 0];
+        response.data.farmList.slots.forEach(slot => {
+          sources.forEach((source, i) =>
+            sources[i] = source + slot.lastRaid?.booty[i].amount || 0
+          )
+        });
 
-      response.data.farmList.slots.forEach(slot => {
-        sources.forEach((source, i) =>
-          sources[i] = source + slot.lastRaid?.booty[i].amount || 0
-        )
-      });
+        return {
+          name: response.data.farmList.name,
+          sources
+        };
+      })
+  ));
 
-      const theadInnerHtml = `
+  const rowInnerHtml = [];
+
+  for (let i = 0; i < farmListIds.length; i++) {
+    rowInnerHtml.push(`
+        <td>${results[i].name}</td>
+        <td>${results[i].sources[0]}</td>
+        <td>${results[i].sources[1]}</td>
+        <td>${results[i].sources[2]}</td>
+        <td>${results[i].sources[3]}</td>
+      `);
+  }
+  
+  const theadInnerHtml = `
           <tr>
+            <th>Liste</th>
             <th>Odun</th>
             <th>Tuğla</th>
             <th>Demir</th>
@@ -320,15 +343,7 @@ async function getRaidBounties() {
           </tr>
         `;
 
-      const rowInnerHtml = [`
-            <td>${sources[0]}</td>
-            <td>${sources[1]}</td>
-            <td>${sources[2]}</td>
-            <td>${sources[3]}</td>
-          `];
-
-      createTable(theadInnerHtml, rowInnerHtml);
-    });
+  createTable(theadInnerHtml, rowInnerHtml);
 }
 
 function createTable(theadInnerHtml, rowInnerHtml) {
@@ -381,7 +396,7 @@ async function getProfile() {
 
   const data = await response.json();
 
-  return data.data.ownPlayer.farmLists[0].id;
+  return data.data.ownPlayer.farmLists.map(farm => farm.id);
 }
 
 async function getHeroInfo() {
