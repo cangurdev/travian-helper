@@ -48,10 +48,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       getRaidBounties();
     });
   }
+
+  if (request.action === "profile") {
+    getUserProfile();
+  }
 });
 
-function updateTable(payload) {
-  document.querySelector('#travian_ultra_plus > .content > #content > #table').innerHTML = payload;
+function updateTable(payload, location) {
+  if (location)
+    document.querySelector(location).appendChild(payload);
+  else
+    document.querySelector('#travian_ultra_plus > .content > #content > #table').innerHTML = payload.innerHTML;
 }
 
 async function findVillage() {
@@ -326,7 +333,7 @@ async function getRaidBounties() {
   createTable(theadInnerHtml, rowInnerHtml);
 }
 
-function createTable(theadInnerHtml, rowInnerHtml) {
+function createTable(theadInnerHtml, rowInnerHtml, location) {
   const resultDiv = document.createElement("div");
   const table = document.createElement("table");
   const thead = document.createElement("thead");
@@ -346,7 +353,7 @@ function createTable(theadInnerHtml, rowInnerHtml) {
 
   resultDiv.appendChild(table);
 
-  updateTable(resultDiv.innerHTML);
+  updateTable(resultDiv, location);
 }
 
 async function getProfile() {
@@ -387,4 +394,64 @@ async function getHeroInfo() {
   const experience = data.tooltipForExperience.split("Kahramanın")[1].split("tecrübeye")[0].trim();
   
   document.querySelector("#heroArea").innerHTML = `Deneyim: ${experience} | Sağlık: ${health}`;
+}
+
+async function getUserProfile() {
+  const url = document.querySelector(".player > a")?.href;
+  
+  if (!url)
+      return;
+
+  fetch(url)
+  .then(response => response.text())
+  .then(html => {
+    // Create a DOMParser instance to parse the HTML string
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    
+    // Select the <script> tag that contains the desired data
+    const scriptTag = [...doc.querySelectorAll('script')].find(script => script.textContent.includes('Travian.React.PlayerProfile.render'));
+
+    if (scriptTag) {
+      // Extract the content of the script
+      const scriptContent = scriptTag.textContent;
+
+      // Use regex to extract the JSON string for `viewData`
+      const viewDataMatch = scriptContent.match(/viewData:\s*({[\s\S]*}),\s*playerId/);
+
+      if (viewDataMatch && viewDataMatch[1]) {
+        const viewDataString = viewDataMatch[1];
+
+        try {
+          // Parse the JSON string
+          const viewData = JSON.parse(viewDataString);
+
+          // Example: Accessing some data
+          const villages = viewData.data.player.villages;
+          document.querySelector("#tileDetails")
+
+          const rowInnerHtml = villages.map( village => `
+                <td>${village.name}</td>
+                <td>${village.population}</td>
+                <td>${village.x} | ${village.y}</td>
+            `)
+          const theadInnerHtml = `
+                  <tr>
+                    <th>Köy</th>
+                    <th>Nüfus</th>
+                    <th>Koordinat</th>
+                  </tr>
+                `;
+        
+          createTable(theadInnerHtml, rowInnerHtml, "#tileDetails");
+
+        } catch (error) {
+          console.error("Failed to parse viewData JSON:", error);
+        }
+      }
+    } else {
+      console.error("Script tag with Travian.React.PlayerProfile.render not found.");
+    }
+  })
+  .catch(error => console.error('Error fetching or parsing the page:', error)); 
 }

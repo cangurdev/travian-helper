@@ -6,7 +6,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     ];
 
     const url = new URL(tab.url);
-        
+    
     if (
         url.host === "ts8.x1.europe.travian.com" 
         && changeInfo.status === 'complete'
@@ -14,14 +14,19 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     ) {
         chrome.storage.local.get('toggleEnabled', function(data) {            
             if (data.toggleEnabled) {
-                load();
+                sendMessage("load");
             }
         });
+
+        if (url.search.match(/\?x=\-*\d+&y=\-*\d+/) ) {
+            sendMessage("profile");
+        }
+
     }
 });
 
-function load() {
+function sendMessage(action) {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        chrome.tabs.sendMessage(tabs[0].id, { action: "load" });
+        chrome.tabs.sendMessage(tabs[0].id, { action });
     });
 }
