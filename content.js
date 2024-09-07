@@ -5,10 +5,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const div       = document.createElement("div");
 
     div.id          = "travian_ultra_plus";
-    div.style.width = "600px";
 
     div.innerHTML = `
-                <div class='content sidebarBoxWrapper'>
+                <div class='content sidebarBoxWrapper' style="width:600px; top:225px">
                   <div id="heroArea" class="boxTitle"></div>
                   <div 
                     id    = "content"
