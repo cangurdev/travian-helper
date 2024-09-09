@@ -428,11 +428,20 @@ async function getUserProfile() {
           // Example: Accessing some data
           const villages = viewData.data.player.villages;
           document.querySelector("#tileDetails")
+          const myX = -64;
+          const myY = 29;
 
           const rowInnerHtml = villages.map( village => `
                 <td>${village.name}</td>
                 <td>${village.population}</td>
-                <td>${village.x} | ${village.y}</td>
+                <td><a 
+                  target="_blank" 
+                  href="https://ts8.x1.europe.travian.com/karte.php?x=${village.x}&y=${village.y}"
+                  title = (${village.x}|${village.y})
+                >
+                  (${village.x}|${village.y}) |
+                  ${getDistance(myX, myY,village.x,village.y).toFixed(1)}
+                  </a></td>
             `)
           const theadInnerHtml = `
                   <tr>
