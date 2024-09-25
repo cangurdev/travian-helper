@@ -158,7 +158,7 @@ async function findVillage() {
       rowInnerHtml.push(`
           <td><a 
             target="_blank" 
-            href="https://ts8.x1.europe.travian.com/karte.php?x=${tile.x}&y=${tile.y}"
+            href="/karte.php?x=${tile.x}&y=${tile.y}"
             title = (${tile.x}|${tile.y})
           >
             ${tile.name}
@@ -198,7 +198,7 @@ async function sendReq() {
     }
   };
 
-  const response = await fetch("https://ts8.x1.europe.travian.com/api/v1/map/position", {
+  const response = await fetch(`/api/v1/map/position`, {
     "headers": {
       "accept": "application/json, text/javascript, */*; q=0.01",
       "accept-language": "en-US,en;q=0.9,tr;q=0.8",
@@ -206,7 +206,7 @@ async function sendReq() {
       "x-requested-with": "XMLHttpRequest",
       "x-version": "2531.7",
     },
-    "referrer": `https://ts8.x1.europe.travian.com/karte.php?zoom=${zoom}&x=${x}&y=${y}`,
+    "referrer": `${document.location.host}/karte.php?zoom=${zoom}&x=${x}&y=${y}`,
     "body": JSON.stringify(obj),
     "method": "POST",
     "credentials": "include"
@@ -320,7 +320,7 @@ async function getRaidBounties() {
   
   const results = await Promise.all(
     farmListIds.map( id => 
-      fetch("https://ts8.x1.europe.travian.com/api/v1/graphql", {
+      fetch(`/api/v1/graphql`, {
         "headers": {
           "accept": "application/json, text/javascript, */*; q=0.01",
           "accept-language": "en-US,en;q=0.9,tr;q=0.8",
@@ -328,7 +328,7 @@ async function getRaidBounties() {
           "x-requested-with": "XMLHttpRequest",
           "x-version": "2546.3"
         },
-        "referrer": "https://ts8.x1.europe.travian.com/build.php?id=39&gid=16&tt=99",
+        "referrer": `${document.location.host}/build.php?id=39&gid=16&tt=99`,
         "body": `{\"query\":\"query($id: Int!, $onlyExpanded: Boolean){bootstrapData{timestamp}weekendWarrior{isNightTruce}farmList(id: $id){id name slotsAmount runningRaidsAmount isExpanded sortIndex lastStartedTime sortField sortDirection useShip ownerVillage{id troops{ownTroopsAtTown{units{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}}}}defaultTroop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}slotStates: slots{id isActive}slots(onlyExpanded: $onlyExpanded){id target{id mapId x y name type population}troop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}distance isActive isRunning runningAttacks nextAttackAt lastRaid{reportId authKey time booty{resourceType{id code}amount}bootyMax icon}totalBooty{booty raids}}}}\",\"variables\":{\"id\":${id},\"onlyExpanded\":false}}`,
         "method": "POST",
         "credentials": "include"
@@ -399,7 +399,7 @@ function createTable(theadInnerHtml, rowInnerHtml, location) {
 }
 
 async function getProfile() {
-  const response = await fetch("https://ts8.x1.europe.travian.com/api/v1/graphql", {
+  const response = await fetch(`/api/v1/graphql`, {
     "headers": {
       "accept": "application/json, text/javascript, */*; q=0.01",
       "accept-language": "en-US,en;q=0.9,tr;q=0.8",
@@ -407,7 +407,7 @@ async function getProfile() {
       "x-requested-with": "XMLHttpRequest",
       "x-version": "2546.3"
     },
-    "referrer": "https://ts8.x1.europe.travian.com/build.php?id=39&gid=16",
+    "referrer": `${document.location.host}/build.php?id=39&gid=16`,
     "body": "{\"query\":\"query($onlyExpanded: Boolean){bootstrapData{timestamp}weekendWarrior{isNightTruce}ownPlayer{isSitter isInVacationMode beginnersProtection accessRights{sendRaids}banInfo{type}village{id tribeId}villages{id name hasRallyPoint hasHarbour tribeId}abandonedFarmLists{id name slotsAmount runningRaidsAmount isExpanded sortIndex lastStartedTime sortField sortDirection useShip ownerVillage{id}defaultTroop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}slotStates: slots{id isActive}slots(onlyExpanded: $onlyExpanded){id target{id mapId x y name type population}troop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}distance isActive isRunning runningAttacks nextAttackAt lastRaid{reportId authKey time booty{resourceType{id code}amount}bootyMax icon}totalBooty{booty raids}}}farmLists{id name slotsAmount runningRaidsAmount isExpanded sortIndex lastStartedTime sortField sortDirection useShip ownerVillage{id troops{ownTroopsAtTown{units{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}}}}defaultTroop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}slotStates: slots{id isActive}slots(onlyExpanded: $onlyExpanded){id target{id mapId x y name type population}troop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}distance isActive isRunning runningAttacks nextAttackAt lastRaid{reportId authKey time booty{resourceType{id code}amount}bootyMax icon}totalBooty{booty raids}}}deactivatedFarmListTargets{id mapId x y name type}}}\",\"variables\":{\"onlyExpanded\":true}}",
     "method": "POST",
     "credentials": "include"
@@ -419,14 +419,14 @@ async function getProfile() {
 }
 
 async function getHeroInfo() {
-  const response = await fetch("https://ts8.x1.europe.travian.com/api/v1/hero/dataForHUD", {
+  const response = await fetch(`/api/v1/hero/dataForHUD`, {
     "headers": {
       "accept": "application/json",
       "content-type": "application/json",
       "x-requested-with": "XMLHttpRequest",
       "x-version": "2546.3"
     },
-    "referrer": "https://ts8.x1.europe.travian.com/karte.php?zoom=1&x=-61&y=24",
+    "referrer": `${document.location.host}/karte.php?zoom=1&x=-61&y=24`,
     "method": "GET",
     "credentials": "include"
   });
@@ -479,7 +479,7 @@ async function getUserProfile() {
                 <td>${village.population}</td>
                 <td><a 
                   target="_blank" 
-                  href="https://ts8.x1.europe.travian.com/karte.php?x=${village.x}&y=${village.y}"
+                  href="/karte.php?x=${village.x}&y=${village.y}"
                   title = (${village.x}|${village.y})
                 >
                   (${village.x}|${village.y}) |
