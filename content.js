@@ -7,12 +7,24 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     div.id          = "travian_ultra_plus";
 
     div.innerHTML = `
-                <div class='content sidebarBoxWrapper' style="width:600px; top:225px">
-                  <div id="heroArea" class="boxTitle"></div>
-                  <div 
+                <div class='content sidebarBoxWrapper' id="openButtonContainer">
+                  <button id="openButton">Aç</button>
+                </div>
+                <div id="contentContainer" class='content sidebarBoxWrapper' style="width:600px; display: none;">
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div id="heroArea" class="boxTitle"></div>
+                    <div id="closeButton" class="dialogCancelButton iconButton buttonFramed green withIcon rectangle cancel">
+                            <svg viewBox="0 0 20 20"><g class="outline">
+                          <path d="M0 17.01L7.01 10 .14 3.13 3.13.14 10 7.01 17.01 0 20 2.99 12.99 10l6.87 6.87-2.99 2.99L10 12.99 2.99 20 0 17.01z"></path>
+                        </g><g class="icon">
+                          <path d="M0 17.01L7.01 10 .14 3.13 3.13.14 10 7.01 17.01 0 20 2.99 12.99 10l6.87 6.87-2.99 2.99L10 12.99 2.99 20 0 17.01z"></path>
+                        </g></svg>
+                          </div>
+                    </div>
+                    <div 
                     id    = "content"
                     class = 'sidebarBox'
-                    style = "width:100%; text-align:center"
+                    style = "width:100%; text-align:center;"
                   >
                     <button 
                       id    = "find"
@@ -26,6 +38,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     >Yağma</button>
                     <div id='table' style="max-height: 300px; overflow:auto; margin-top:20px"></div>
                     </div>
+                  </div>
                 </div>
             `;
     div.className = "sidebarBox";
@@ -41,6 +54,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     document.getElementById('find').addEventListener('click', () => {
       findVillage();
+    });
+
+    document.getElementById('openButton').addEventListener('click', () => {
+      openModal();
+    });
+    document.getElementById('closeButton').addEventListener('click', () => {
+      closeModal();
     });
 
     document.getElementById('raid').addEventListener('click', () => {
@@ -59,6 +79,29 @@ function updateTable(payload, location) {
   else
     document.querySelector('#travian_ultra_plus > .content > #content > #table').innerHTML = payload.innerHTML;
 }
+
+function closeModal() {
+  const content = document.querySelector('#contentContainer');
+  const openButton = document.querySelector('#openButtonContainer');
+
+  content.style.position = '';
+  content.style.zIndex = '';
+  content.style.bottom = '';
+  content.style.display = 'none';
+  openButton.style.display = 'block';
+}
+
+function openModal() {
+  const content = document.querySelector('#contentContainer');
+  const openButton = document.querySelector('#openButtonContainer');
+
+  content.style.position = 'absolute';
+  content.style.zIndex = '99';
+  content.style.bottom = '0';
+  content.style.display = 'block';
+  openButton.style.display = 'none';
+}
+
 
 async function findVillage() {
   const myX = -64;
