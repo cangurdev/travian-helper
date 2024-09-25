@@ -8,7 +8,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     const url = new URL(tab.url);
     
     if (
-        url.host === "ts8.x1.europe.travian.com" 
+        url.host.includes("travian.com")
         && changeInfo.status === 'complete'
         && paths.includes(url.pathname)
     ) {
