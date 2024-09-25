@@ -6,65 +6,72 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     div.id          = "travian_ultra_plus";
 
-    div.innerHTML = `
-                <div class='content sidebarBoxWrapper' id="openButtonContainer">
-                  <button id="openButton">Aç</button>
-                </div>
-                <div id="contentContainer" class='content sidebarBoxWrapper' style="width:600px; display: none;">
-                  <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <div id="heroArea" class="boxTitle"></div>
-                    <div id="closeButton" class="dialogCancelButton iconButton buttonFramed green withIcon rectangle cancel">
-                            <svg viewBox="0 0 20 20"><g class="outline">
-                          <path d="M0 17.01L7.01 10 .14 3.13 3.13.14 10 7.01 17.01 0 20 2.99 12.99 10l6.87 6.87-2.99 2.99L10 12.99 2.99 20 0 17.01z"></path>
-                        </g><g class="icon">
-                          <path d="M0 17.01L7.01 10 .14 3.13 3.13.14 10 7.01 17.01 0 20 2.99 12.99 10l6.87 6.87-2.99 2.99L10 12.99 2.99 20 0 17.01z"></path>
-                        </g></svg>
-                          </div>
-                    </div>
-                    <div 
-                    id    = "content"
-                    class = 'sidebarBox'
-                    style = "width:100%; text-align:center;"
-                  >
-                    <button 
-                      id    = "find"
-                      class = "layoutButton buttonFramed round market"
-                      style = "padding:10px; color:#fff; margin-bottom 20px;"
-                    >Köyler</button>
-                    <button 
-                      id    = "raid"
-                      class = "layoutButton buttonFramed round market"
-                      style = "padding:10px; color:#fff; margin-bottom 20px;"
-                    >Yağma</button>
-                    <div id='table' style="max-height: 300px; overflow:auto; margin-top:20px"></div>
+    chrome.storage.local.get(['xCoordinate', 'yCoordinate'], function(result) {
+      div.innerHTML = `
+                  <div style="display: flex; width: 100px">
+                    <div id="tp-x">${result.xCoordinate}</div>
+                    <div>|</div>
+                    <div id="tp-y">${result.yCoordinate}</div>
+                  </div>
+                  <div class='content sidebarBoxWrapper' id="openButtonContainer">
+                    <button id="openButton">Aç</button>
+                  </div>
+                  <div id="contentContainer" class='content sidebarBoxWrapper' style="width:600px; display: none;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                      <div id="heroArea" class="boxTitle"></div>
+                      <div id="closeButton" class="dialogCancelButton iconButton buttonFramed green withIcon rectangle cancel">
+                              <svg viewBox="0 0 20 20"><g class="outline">
+                            <path d="M0 17.01L7.01 10 .14 3.13 3.13.14 10 7.01 17.01 0 20 2.99 12.99 10l6.87 6.87-2.99 2.99L10 12.99 2.99 20 0 17.01z"></path>
+                          </g><g class="icon">
+                            <path d="M0 17.01L7.01 10 .14 3.13 3.13.14 10 7.01 17.01 0 20 2.99 12.99 10l6.87 6.87-2.99 2.99L10 12.99 2.99 20 0 17.01z"></path>
+                          </g></svg>
+                            </div>
+                      </div>
+                      <div 
+                      id    = "content"
+                      class = 'sidebarBox'
+                      style = "width:100%; text-align:center;"
+                    >
+                      <button 
+                        id    = "find"
+                        class = "layoutButton buttonFramed round market"
+                        style = "padding:10px; color:#fff; margin-bottom 20px;"
+                      >Köyler</button>
+                      <button 
+                        id    = "raid"
+                        class = "layoutButton buttonFramed round market"
+                        style = "padding:10px; color:#fff; margin-bottom 20px;"
+                      >Yağma</button>
+                      <div id='table' style="max-height: 300px; overflow:auto; margin-top:20px"></div>
+                      </div>
                     </div>
                   </div>
-                </div>
-            `;
-    div.className = "sidebarBox";
-    
-    if (container) {
-      container.innerHTML = div.innerHTML;
-    } else {
-      wrapper.appendChild(div);
-    }
-
-    getHeroInfo();
-    findVillage();    
-
-    document.getElementById('find').addEventListener('click', () => {
-      findVillage();
-    });
-
-    document.getElementById('openButton').addEventListener('click', () => {
-      openModal();
-    });
-    document.getElementById('closeButton').addEventListener('click', () => {
-      closeModal();
-    });
-
-    document.getElementById('raid').addEventListener('click', () => {
-      getRaidBounties();
+              `;
+      div.className = "sidebarBox";
+      
+      if (container) {
+        container.innerHTML = div.innerHTML;
+      } else {
+        wrapper.appendChild(div);
+      }
+  
+      getHeroInfo();
+      findVillage(result.xCoordinate, result.yCoordinate);
+  
+      document.getElementById('find').addEventListener('click', () => {
+        findVillage(result.xCoordinate, result.yCoordinate);
+      });
+  
+      document.getElementById('openButton').addEventListener('click', () => {
+        openModal();
+      });
+      document.getElementById('closeButton').addEventListener('click', () => {
+        closeModal();
+      });
+  
+      document.getElementById('raid').addEventListener('click', () => {
+        getRaidBounties();
+      });
     });
   }
 
@@ -103,11 +110,8 @@ function openModal() {
 }
 
 
-async function findVillage() {
-  const myX = -64;
-  const myY = 29;
-
-  sendReq().then(res => {
+async function findVillage(myX, myY) {
+  sendReq(myX, myY).then(res => {
     const tiles = res.tiles;
 
     const theadInnerHtml = `
@@ -178,12 +182,9 @@ async function findVillage() {
   )
 };
 
-async function sendReq() {
+async function sendReq(myX, myY) {
   const currentUrl = document.location.href;
   const url = new URL(currentUrl);
-
-  const myX = -64;
-  const myY = 29;
 
   const zoom = 3;
   const x = url.searchParams.get('x') || myX;
@@ -471,8 +472,8 @@ async function getUserProfile() {
           // Example: Accessing some data
           const villages = viewData.data.player.villages;
           document.querySelector("#tileDetails")
-          const myX = -64;
-          const myY = 29;
+          const myX = document.getElementById('tp-x');
+          const myY = document.getElementById('tp-y');
 
           const rowInnerHtml = villages.map( village => `
                 <td>${village.name}</td>
