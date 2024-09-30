@@ -243,6 +243,8 @@ function extractAttrs(str, did) {
     "v3": "Galyalı",
     "v4": "Doğa",
     "v5": "Natar",
+    "v6": "Mısırlı",
+    "v7": "Hun",
   }
 
   if (did === -1) {
