@@ -62,7 +62,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
   
       getHeroInfo();
-      findVillage(result.xCoordinate, result.yCoordinate);
+      findVillage(result.xCoordinate, result.yCoordinate, "nature");
   
       document.getElementById('find').addEventListener('click', () => {
         findVillage(result.xCoordinate, result.yCoordinate);
