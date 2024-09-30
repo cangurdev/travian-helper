@@ -39,6 +39,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                         style = "padding:10px; color:#fff; margin-bottom 20px;"
                       >Köyler</button>
                       <button 
+                        id    = "findNature"
+                        class = "layoutButton buttonFramed round market"
+                        style = "padding:10px; color:#fff; margin-bottom 20px;"
+                      >Vaha</button>
+                      <button 
                         id    = "raid"
                         class = "layoutButton buttonFramed round market"
                         style = "padding:10px; color:#fff; margin-bottom 20px;"
@@ -72,6 +77,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   
       document.getElementById('raid').addEventListener('click', () => {
         getRaidBounties();
+      });
+
+      document.getElementById('findNature').addEventListener('click', () => {
+        findVillage(result.xCoordinate, result.yCoordinate, "nature");
       });
     });
   }
@@ -110,7 +119,7 @@ function openModal() {
 }
 
 
-async function findVillage(myX, myY) {
+async function findVillage(myX, myY, type) {
   sendReq(myX, myY).then(res => {
     const tiles = res.tiles;
 
@@ -124,7 +133,7 @@ async function findVillage(myX, myY) {
         </tr>
       `;
 
-    let tileList = [];
+    let tileList     = [];
     let elephantList = [];
 
     tiles?.forEach((tile) => {
@@ -142,11 +151,12 @@ async function findVillage(myX, myY) {
           x: tile.position.x,
           y: tile.position.y
         }
+        const isNature = attrs.tribe?.includes("Doğa");
 
-        if (attrs.population?.includes("Fil")) {
-          elephantList.push(model);
-        } else {
+        if (type !== "nature" && !isNature) {
           tileList.push(model);
+        } else if (type === "nature" && isNature) {
+          (attrs.population?.includes("Fil") ? elephantList : tileList).push(model);
         }
       }
     })
@@ -266,6 +276,7 @@ function extractAttrs(str, did) {
 
     return {
       name: "Boş Vaha",
+      tribe: "Doğa",
       population: Object.keys(unitValues).map(x => unitValues[x] + " " + x).join("<br>")
     };
   }
