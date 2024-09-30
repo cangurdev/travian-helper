@@ -5,20 +5,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const div       = document.createElement("div");
 
     div.id          = "travian_ultra_plus";
+    const display = document.URL.includes("karte.php") ? "block" : "none";
 
     chrome.storage.local.get(['xCoordinate', 'yCoordinate'], function(result) {
       div.innerHTML = `
-                  <div style="display: flex; width: 100px">
-                    <div id="tp-x">${result.xCoordinate}</div>
-                    <div>|</div>
-                    <div id="tp-y">${result.yCoordinate}</div>
+                  <div class='content sidebarBoxWrapper' id="openButtonContainer" style="display: flex; flex-direction: column; align-items: center;">
+                    <div id="heroArea" class="boxTitle"></div>
+                    <button class="layoutButton buttonFramed round market" style="color: white; padding: 5px 20px; margin-top:20px;" id="openButton">Aç</button>
+                    <div style="display: flex; visibility: hidden;">
+                      <div id="tp-x">${result.xCoordinate}</div>
+                      <div>|</div>
+                      <div id="tp-y">${result.yCoordinate}</div>
+                      </div>
                   </div>
-                  <div class='content sidebarBoxWrapper' id="openButtonContainer">
-                    <button id="openButton">Aç</button>
-                  </div>
-                  <div id="contentContainer" class='content sidebarBoxWrapper' style="width:600px; display: none;">
+                  <div id="contentContainer" class='content sidebarBoxWrapper' style="width:600px; display: ${display};">
                     <div style="display: flex; align-items: center; justify-content: space-between;">
-                      <div id="heroArea" class="boxTitle"></div>
                       <div id="closeButton" class="dialogCancelButton iconButton buttonFramed green withIcon rectangle cancel">
                               <svg viewBox="0 0 20 20"><g class="outline">
                             <path d="M0 17.01L7.01 10 .14 3.13 3.13.14 10 7.01 17.01 0 20 2.99 12.99 10l6.87 6.87-2.99 2.99L10 12.99 2.99 20 0 17.01z"></path>
@@ -95,14 +96,13 @@ function closeModal() {
   content.style.zIndex = '';
   content.style.bottom = '';
   content.style.display = 'none';
-  openButton.style.display = 'block';
+  openButton.style.display = 'flex';
 }
 
 function openModal() {
   const content = document.querySelector('#contentContainer');
   const openButton = document.querySelector('#openButtonContainer');
 
-  content.style.position = 'absolute';
   content.style.zIndex = '99';
   content.style.bottom = '0';
   content.style.display = 'block';
