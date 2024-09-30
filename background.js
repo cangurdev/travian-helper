@@ -1,16 +1,9 @@
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {    
-    const paths = [
-        "/dorf1.php", 
-        "/karte.php", 
-        "/dorf2.php"
-    ];
-
     const url = new URL(tab.url);
     
     if (
         url.host.includes("travian.com")
         && changeInfo.status === 'complete'
-        && paths.includes(url.pathname)
     ) {
         chrome.storage.local.get('toggleEnabled', function(data) {            
             if (data.toggleEnabled) {
