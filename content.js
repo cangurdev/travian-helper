@@ -49,7 +49,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                       </div>
                   </div>
                   <div id="contentContainer" class='content sidebarBoxWrapper' style="width:600px; display: ${display};">
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; justify-content: end;">
                       <div id="closeButton" class="dialogCancelButton iconButton buttonFramed green withIcon rectangle cancel">
                               <svg viewBox="0 0 20 20"><g class="outline">
                             <path d="M0 17.01L7.01 10 .14 3.13 3.13.14 10 7.01 17.01 0 20 2.99 12.99 10l6.87 6.87-2.99 2.99L10 12.99 2.99 20 0 17.01z"></path>
@@ -73,11 +73,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                         class = "layoutButton buttonFramed round market"
                         style = "padding:10px; color:#fff; margin-bottom 20px;"
                       >Vaha</button>
-                      <button 
-                        id    = "raid"
-                        class = "layoutButton buttonFramed round market"
-                        style = "padding:10px; color:#fff; margin-bottom 20px;"
-                      >Yağma</button>
                       <div id='table' style="max-height: 300px; overflow:auto; margin-top:20px"></div>
                       </div>
                     </div>
@@ -103,10 +98,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       });
       document.getElementById('closeButton').addEventListener('click', () => {
         closeModal();
-      });
-  
-      document.getElementById('raid').addEventListener('click', () => {
-        getRaidBounties();
       });
 
       document.getElementById('findNature').addEventListener('click', () => {
@@ -210,7 +201,7 @@ async function findVillage(myX, myY, type) {
           <td>${tile.tribe || ""}</td>
           <td>${tile.population}</td>
           <td>${tile.clan || ""}</td>
-          <td>${tile.distance.toFixed(1)}<br>${getTime(tile.distance)}</td>
+          <td>${tile.distance.toFixed(1)}</td>
         `)
     });
 
@@ -346,79 +337,6 @@ function decodeHtmlEntities(encodedString) {
   return dom.documentElement.textContent;
 }
 
-function getTime(distance) {
-  const time = distance / 19;
-  const hours = Math.floor(time);
-  const minutes = Math.floor(((time - hours) * 60));
-  const seconds = Math.round((((time - hours) * 60) - minutes) * 60);
-
-  const formattedHours = String(hours).padStart(2, '0');
-  const formattedMinutes = String(minutes).padStart(2, '0');
-  const formattedSeconds = String(seconds).padStart(2, '0');
-
-  return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
-}
-
-async function getRaidBounties() {
-  const farmListIds = await getProfile();
-  
-  const results = await Promise.all(
-    farmListIds.map( id => 
-      fetch(`/api/v1/graphql`, {
-        "headers": {
-          "accept": "application/json, text/javascript, */*; q=0.01",
-          "accept-language": "en-US,en;q=0.9,tr;q=0.8",
-          "content-type": "application/json; charset=UTF-8",
-          "x-requested-with": "XMLHttpRequest",
-          "x-version": "2546.3"
-        },
-        "referrer": `${document.location.host}/build.php?id=39&gid=16&tt=99`,
-        "body": `{\"query\":\"query($id: Int!, $onlyExpanded: Boolean){bootstrapData{timestamp}weekendWarrior{isNightTruce}farmList(id: $id){id name slotsAmount runningRaidsAmount isExpanded sortIndex lastStartedTime sortField sortDirection useShip ownerVillage{id troops{ownTroopsAtTown{units{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}}}}defaultTroop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}slotStates: slots{id isActive}slots(onlyExpanded: $onlyExpanded){id target{id mapId x y name type population}troop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}distance isActive isRunning runningAttacks nextAttackAt lastRaid{reportId authKey time booty{resourceType{id code}amount}bootyMax icon}totalBooty{booty raids}}}}\",\"variables\":{\"id\":${id},\"onlyExpanded\":false}}`,
-        "method": "POST",
-        "credentials": "include"
-      })
-      .then(res => res.json())
-      .then(response => {
-        const sources = [0, 0, 0, 0];
-
-        response.data.farmList.slots.forEach(slot => {
-          sources.forEach((source, i) =>
-            sources[i] = source + slot.lastRaid?.booty[i].amount || 0
-          )
-        });
-
-        return {
-          name: response.data.farmList.name,
-          sources
-        };
-      })
-  ));
-
-  const rowInnerHtml = [];
-
-  for (let i = 0; i < farmListIds.length; i++) {
-    rowInnerHtml.push(`
-        <td>${results[i].name}</td>
-        <td>${results[i].sources[0]}</td>
-        <td>${results[i].sources[1]}</td>
-        <td>${results[i].sources[2]}</td>
-        <td>${results[i].sources[3]}</td>
-      `);
-  }
-  
-  const theadInnerHtml = `
-          <tr>
-            <th>Liste</th>
-            <th>Odun</th>
-            <th>Tuğla</th>
-            <th>Demir</th>
-            <th>Tahıl</th>
-          </tr>
-        `;
-
-  createTable(theadInnerHtml, rowInnerHtml);
-}
-
 function createTable(theadInnerHtml, rowInnerHtml, location) {
   const resultDiv = document.createElement("div");
   const table = document.createElement("table");
@@ -440,26 +358,6 @@ function createTable(theadInnerHtml, rowInnerHtml, location) {
   resultDiv.appendChild(table);
 
   updateTable(resultDiv, location);
-}
-
-async function getProfile() {
-  const response = await fetch(`/api/v1/graphql`, {
-    "headers": {
-      "accept": "application/json, text/javascript, */*; q=0.01",
-      "accept-language": "en-US,en;q=0.9,tr;q=0.8",
-      "content-type": "application/json; charset=UTF-8",
-      "x-requested-with": "XMLHttpRequest",
-      "x-version": "2546.3"
-    },
-    "referrer": `${document.location.host}/build.php?id=39&gid=16`,
-    "body": "{\"query\":\"query($onlyExpanded: Boolean){bootstrapData{timestamp}weekendWarrior{isNightTruce}ownPlayer{isSitter isInVacationMode beginnersProtection accessRights{sendRaids}banInfo{type}village{id tribeId}villages{id name hasRallyPoint hasHarbour tribeId}abandonedFarmLists{id name slotsAmount runningRaidsAmount isExpanded sortIndex lastStartedTime sortField sortDirection useShip ownerVillage{id}defaultTroop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}slotStates: slots{id isActive}slots(onlyExpanded: $onlyExpanded){id target{id mapId x y name type population}troop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}distance isActive isRunning runningAttacks nextAttackAt lastRaid{reportId authKey time booty{resourceType{id code}amount}bootyMax icon}totalBooty{booty raids}}}farmLists{id name slotsAmount runningRaidsAmount isExpanded sortIndex lastStartedTime sortField sortDirection useShip ownerVillage{id troops{ownTroopsAtTown{units{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}}}}defaultTroop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}slotStates: slots{id isActive}slots(onlyExpanded: $onlyExpanded){id target{id mapId x y name type population}troop{t1 t2 t3 t4 t5 t6 t7 t8 t9 t10}distance isActive isRunning runningAttacks nextAttackAt lastRaid{reportId authKey time booty{resourceType{id code}amount}bootyMax icon}totalBooty{booty raids}}}deactivatedFarmListTargets{id mapId x y name type}}}\",\"variables\":{\"onlyExpanded\":true}}",
-    "method": "POST",
-    "credentials": "include"
-  })
-
-  const data = await response.json();
-
-  return data.data.ownPlayer.farmLists.map(farm => farm.id);
 }
 
 async function getHeroInfo() {
