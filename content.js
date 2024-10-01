@@ -147,6 +147,7 @@ async function findVillage(myX, myY, type) {
     const theadInnerHtml = `
         <tr>
           <th>Köy</th>
+          <th>Koordinat</th>
           <th>Halk</th>
           <th>Nüfus</th>
           <th>ittifak</th>
@@ -198,6 +199,7 @@ async function findVillage(myX, myY, type) {
           >
             ${tile.name}
             </a></td>
+          <td>(${tile.x} | ${tile.y})</td>
           <td>${tile.tribe || ""}</td>
           <td>${tile.population}</td>
           <td>${tile.clan || ""}</td>
